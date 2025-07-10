@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>セットリスト作成ツール</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1em;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow-x: auto;
+      display: block;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+    input[type="number"] {
+      width: 60px;
+      font-size: 16px;
+    }
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+    .selected {
+      background: #def;
+    }
+    ul {
+      padding-left: 1em;
+    }
+    li {
+      margin-bottom: 0.5em;
+    }
+    @media (max-width: 480px) {
+      body {
+        font-size: 15px;
+      }
+      input[type="number"], input[type="checkbox"] {
+        transform: scale(1.2);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>セットリスト作成</h1>
+  <div id="auth"></div>
+  <div id="app" style="display:none">
+    <h2>曲一覧</h2>
+    <div style="overflow-x: auto;">
+      <table id="songTable"></table>
+    </div>
+    <h2>選ばれたセットリスト</h2>
+    <ul id="setlist"></ul>
+    <p><strong>合計時間: <span id="totalTime">0.0分</span></strong></p>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
