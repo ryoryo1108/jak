@@ -1,11 +1,5 @@
-// 簡易アクセス制限
-const urlParams = new URLSearchParams(window.location.search);
-const key = urlParams.get('key');
-if (key !== 'my-secret-key') {
-  document.getElementById('auth').innerHTML = "<p>アクセス拒否</p>";
-} else {
-  document.getElementById('app').style.display = "block";
-}
+document.getElementById('app').style.display = "block";
+
 
 // 曲一覧（曲名と秒数）
 const songs = [

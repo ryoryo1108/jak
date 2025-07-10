@@ -1,67 +1,90 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>セットリスト作成ツール</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 1em;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      overflow-x: auto;
-      display: block;
-    }
-    th, td {
-      border: 1px solid #aaa;
-      padding: 8px;
-      text-align: left;
-      font-size: 14px;
-    }
-    input[type="number"] {
-      width: 60px;
-      font-size: 16px;
-    }
-    input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-    }
-    .selected {
-      background: #def;
-    }
-    ul {
-      padding-left: 1em;
-    }
-    li {
-      margin-bottom: 0.5em;
-    }
-    @media (max-width: 480px) {
-      body {
-        font-size: 15px;
+// 簡易アクセス制限
+const urlParams = new URLSearchParams(window.location.search);
+const key = urlParams.get('key');
+if (key !== 'my-secret-key') {
+  document.getElementById('auth').innerHTML = "<p>アクセス拒否</p>";
+} else {
+  document.getElementById('app').style.display = "block";
+}
+
+// 曲一覧（曲名と秒数）
+const songs = [
+  { title: "Intro", seconds: 45 },
+  { title: "Rage Anthem", seconds: 120 },
+  { title: "Breakdown", seconds: 180 },
+  { title: "New Song", seconds: 150 },
+  { title: "Encore", seconds: 90 }
+];
+
+const table = document.getElementById('songTable');
+const setlistEl = document.getElementById('setlist');
+const totalTimeEl = document.getElementById('totalTime');
+
+function formatTime(totalSec) {
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return ${m}:${s.toString().padStart(2, '0')};
+}
+
+// 表を作る
+function renderTable() {
+  table.innerHTML = 
+    <tr><th>選択</th><th>順番</th><th>曲名</th><th>時間</th></tr>
+  ;
+
+  songs.forEach((song, idx) => {
+    const row = document.createElement('tr');
+    row.innerHTML = 
+      <td><input type="checkbox" data-idx="${idx}" /></td>
+      <td><input type="number" min="1" data-order="${idx}" /></td>
+      <td>${song.title}</td>
+      <td>${formatTime(song.seconds)}</td>
+    ;
+    table.appendChild(row);
+  });
+
+  // イベント設定
+  table.querySelectorAll('input').forEach(input => {
+    input.addEventListener('change', renderSetlist);
+  });
+}
+
+// セットリスト表示
+function renderSetlist() {
+  const selected = [];
+
+  table.querySelectorAll('tr').forEach((row, i) => {
+    if (i === 0) return; // ヘッダ
+
+    const checkbox = row.querySelector('input[type="checkbox"]');
+    const orderInput = row.querySelector('input[type="number"]');
+    const idx = parseInt(checkbox.dataset.idx);
+
+    if (checkbox.checked) {
+      const order = parseInt(orderInput.value);
+      if (!isNaN(order)) {
+        selected.push({ order, song: songs[idx] });
+        row.classList.add('selected');
+      } else {
+        row.classList.remove('selected');
       }
-      input[type="number"], input[type="checkbox"] {
-        transform: scale(1.2);
-      }
+    } else {
+      row.classList.remove('selected');
     }
-  </style>
-</head>
-<body>
-  <h1>セットリスト作成</h1>
-  <div id="auth"></div>
-  <div id="app" style="display:none">
-    <h2>曲一覧</h2>
-    <div style="overflow-x: auto;">
-      <table id="songTable"></table>
-    </div>
-    <h2>選ばれたセットリスト</h2>
-    <ul id="setlist"></ul>
-    <p><strong>合計時間: <span id="totalTime">0.0分</span></strong></p>
-  </div>
-  <script src="script.js"></script>
-</body>
-</html>
+  });
+
+  selected.sort((a, b) => a.order - b.order);
+
+  setlistEl.innerHTML = '';
+  let total = 0;
+  selected.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = ${item.order}. ${item.song.title} (${formatTime(item.song.seconds)});
+    setlistEl.appendChild(li);
+    total += item.song.seconds;
+  });
+
+  totalTimeEl.textContent = formatTime(total);
+}
+
+renderTable();
