@@ -8,6 +8,7 @@ const songs = [
   { title: "Captain Dandruff", seconds: 270 },
   { title: "M.B.D.F.", seconds: 180 },
   { title: "松風", seconds: 300 },
+  { title: "cut-let", seconds: 120 },
   { title: 'Dancing "the" jewelry', seconds: 210 },
   { title: "cowchicken-fu", seconds: 300 },
   { title: "curious case", seconds: 300 },
