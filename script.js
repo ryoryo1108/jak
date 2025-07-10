@@ -28,60 +28,55 @@ const totalTimeEl = document.getElementById('totalTime');
 
 function renderTable() {
   table.innerHTML = `
-    <tr><th>選択</th><th>順番</th><th>曲名</th><th>時間</th></tr>
+    <tr><th>選択</th><th>曲名</th><th>時間</th></tr>
   `;
 
   songs.forEach((song, idx) => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td><input type="checkbox" data-idx="${idx}"></td>
-      <td><input type="number" min="1" data-order="${idx}"></td>
       <td>${song.title}</td>
       <td>${formatTime(song.seconds)}</td>
     `;
     table.appendChild(row);
   });
 
-  table.querySelectorAll('input').forEach(input => {
+  // チェックボックスが変更されたときにリストを再描画
+  table.querySelectorAll('input[type="checkbox"]').forEach(input => {
     input.addEventListener('change', renderSetlist);
   });
 }
 
 function renderSetlist() {
-  const selected = [];
+  setlistEl.innerHTML = '';
+  let total = 0;
 
   table.querySelectorAll('tr').forEach((row, i) => {
-    if (i === 0) return;
+    if (i === 0) return; // ヘッダー行
 
     const checkbox = row.querySelector('input[type="checkbox"]');
-    const orderInput = row.querySelector('input[type="number"]');
     const idx = parseInt(checkbox.dataset.idx);
 
     if (checkbox.checked) {
-      const order = parseInt(orderInput.value);
-      if (!isNaN(order)) {
-        selected.push({ order, song: songs[idx] });
-        row.classList.add('selected');
-      } else {
-        row.classList.remove('selected');
-      }
+      const song = songs[idx];
+      const li = document.createElement('li');
+      li.textContent = `${song.title} (${formatTime(song.seconds)})`;
+      li.dataset.idx = idx; // 識別用に格納
+      setlistEl.appendChild(li);
+      total += song.seconds;
+      row.classList.add('selected');
     } else {
       row.classList.remove('selected');
     }
   });
 
-  selected.sort((a, b) => a.order - b.order);
-
-  setlistEl.innerHTML = '';
-  let total = 0;
-  selected.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = `${item.order}. ${item.song.title} (${formatTime(item.song.seconds)})`;
-    setlistEl.appendChild(li);
-    total += item.song.seconds;
-  });
-
   totalTimeEl.textContent = formatTime(total);
 }
+
+// 並べ替え機能を有効化（スマホ対応）
+Sortable.create(setlistEl, {
+  animation: 150,
+  ghostClass: 'ghost'
+});
 
 renderTable();
